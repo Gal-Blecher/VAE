@@ -21,10 +21,10 @@ if __name__ == '__main__':
     setup_dict = {
         'test_batch': True,
         'latent_dim': 128,
-        'n_epochs': 50,
+        'n_epochs': 500,
         'save_path': 'models/vae_1.pkl',
         'data_dir_path': '/home/gal/DS_dataset/train',
-        'kl_coeff': 1e-6,
+        'kl_coeff': 5e-6,
         'lr': 0.001
     }
     run(setup_dict)

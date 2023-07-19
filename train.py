@@ -27,9 +27,11 @@ def kl_loss(mu, logvar):
     return kl_loss
 
 
-def train_vae(vae, train_loader, num_epochs, save_path):
+def train_vae(vae, train_loader, num_epochs, save_path, setup_dict):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    vae.to(device)
     recon_criterion = nn.MSELoss()
-    optimizer = optim.Adam(vae.parameters(), lr=0.001)
+    optimizer = optim.Adam(vae.parameters(), lr=setup_dict['lr'])
 
     min_loss = float('inf')
     best_model = None
@@ -39,13 +41,14 @@ def train_vae(vae, train_loader, num_epochs, save_path):
         running_kl_loss = 0.0
 
         for images, _ in train_loader:
+            images = images.to(device)
             optimizer.zero_grad()
 
             reconstructed_images, mu, logvar = vae(images)
             recon_loss = recon_criterion(reconstructed_images, images)
             kl = kl_loss(mu, logvar)
 
-            loss = recon_loss + 0.00001 * kl
+            loss = recon_loss + setup_dict['kl_coeff'] * kl
 
             loss.backward()
             optimizer.step()
@@ -61,8 +64,10 @@ def train_vae(vae, train_loader, num_epochs, save_path):
             f"Epoch [{epoch + 1}/{num_epochs}]: Recon Loss: {epoch_recon_loss}, KL Loss: {epoch_kl_loss}, Total Loss: {total_loss}")
 
         if total_loss < min_loss:
+            vae = vae.to('cpu')
             min_loss = total_loss
             best_model = vae.state_dict()
             torch.save(vae.state_dict(), save_path)
+            vae = vae.to(device)
 
     vae.load_state_dict(best_model)

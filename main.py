@@ -14,7 +14,7 @@ def run(setup_dict):
         z = model.reparameterize(mu, logvar)
         output = model.decode(z)
 
-    model = train.train_vae(model, train_dataloader, setup_dict['n_epochs'], setup_dict['save_path'])
+    model = train.train_vae(model, train_dataloader, setup_dict['n_epochs'], setup_dict['save_path'], setup_dict)
 
 
 if __name__ == '__main__':
@@ -23,7 +23,9 @@ if __name__ == '__main__':
         'latent_dim': 128,
         'n_epochs': 50,
         'save_path': '/Users/galblecher/Desktop/private/inter/imagene/models/vae_1.pkl',
-        'data_dir_path': '/Users/galblecher/Desktop/private/inter/imagene/DS_dataset/train'
+        'data_dir_path': '/Users/galblecher/Desktop/private/inter/imagene/DS_dataset/train',
+        'kl_coeff': 1e-6,
+        'lr': 0.001
     }
     run(setup_dict)
 

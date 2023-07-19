@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.optim as optim
 import matplotlib.pyplot as plt
 import numpy as np
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+
 
 def plot_images(original_images, reconstructed_images):
     fig, axes = plt.subplots(nrows=2, ncols=5, figsize=(12, 5))
@@ -30,8 +32,11 @@ def kl_loss(mu, logvar):
 def train_vae(vae, train_loader, num_epochs, save_path, setup_dict):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     vae.to(device)
+
     recon_criterion = nn.MSELoss()
     optimizer = optim.Adam(vae.parameters(), lr=setup_dict['lr'])
+    scheduler = ReduceLROnPlateau(optimizer, patience=5, factor=0.1, verbose=True)
+
 
     min_loss = float('inf')
     best_model = None
@@ -62,6 +67,7 @@ def train_vae(vae, train_loader, num_epochs, save_path, setup_dict):
 
         print(
             f"Epoch [{epoch + 1}/{num_epochs}]: Recon Loss: {epoch_recon_loss}, KL Loss: {epoch_kl_loss}, Total Loss: {total_loss}")
+        scheduler.step(total_loss)
 
         if total_loss < min_loss:
             vae = vae.to('cpu')

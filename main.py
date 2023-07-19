@@ -9,8 +9,8 @@ def run(setup_dict):
     model = vae.VAE(latent_dim=setup_dict['latent_dim'])
 
     if setup_dict['test_batch']==True:
-        batch = next(iter(train_dataloader))
-        mu, logvar = model.encode(batch[0])
+        batch = next(iter(train_dataloader))[0]
+        mu, logvar = model.encode(batch)
         z = model.reparameterize(mu, logvar)
         output = model.decode(z)
 

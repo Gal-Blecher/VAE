@@ -14,7 +14,7 @@ def run(setup_dict):
         z = model.reparameterize(mu, logvar)
         output = model.decode(z)
 
-    model = train.train_vae(model, train_dataloader, setup_dict['n_epochs'], setup_dict['save_path'], setup_dict)
+    train.train_vae(model, train_dataloader, setup_dict['n_epochs'], setup_dict['save_path'], setup_dict)
 
 
 if __name__ == '__main__':

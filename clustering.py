@@ -9,11 +9,7 @@ def load_model(setup_dict):
     # Create an instance of the model
     model = vae.VAE(setup_dict['latent_dim'])
     state_dict = torch.load(setup_dict['load_path'])
-
-    # Load the state_dict into the model
     model.load_state_dict(state_dict)
-
-    # Set the model to evaluation mode
     model.eval()
 
     train_dataloader = data.get_dataloader(setup_dict['data_dir_path'])

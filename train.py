@@ -70,6 +70,7 @@ def train_vae(vae, train_loader, num_epochs, save_path, setup_dict):
         scheduler.step(total_loss)
 
         if epoch_recon_loss < min_loss:
+            print('saving model')
             vae = vae.to('cpu')
             min_loss = epoch_recon_loss
             best_model = vae.state_dict()

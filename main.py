@@ -22,8 +22,8 @@ if __name__ == '__main__':
         'test_batch': True,
         'latent_dim': 128,
         'n_epochs': 50,
-        'save_path': '/Users/galblecher/Desktop/private/inter/imagene/models/vae_1.pkl',
-        'data_dir_path': '/Users/galblecher/Desktop/private/inter/imagene/DS_dataset/train',
+        'save_path': './models/vae_1.pkl',
+        'data_dir_path': '/home/gal/DS_dataset/train',
         'kl_coeff': 1e-6,
         'lr': 0.001
     }

@@ -63,15 +63,15 @@ def train_vae(vae, train_loader, num_epochs, save_path, setup_dict):
 
         epoch_recon_loss = running_recon_loss / len(train_loader)
         epoch_kl_loss = running_kl_loss / len(train_loader)
-        total_loss = epoch_recon_loss + epoch_kl_loss
+        total_loss = epoch_recon_loss + setup_dict['kl_coeff'] * epoch_kl_loss
 
         print(
-            f"Epoch [{epoch + 1}/{num_epochs}]: Recon Loss: {epoch_recon_loss}, KL Loss: {epoch_kl_loss}, Total Loss: {total_loss}")
+            f"Epoch [{epoch + 1}/{num_epochs}]: Recon Loss: {round(epoch_recon_loss,5)}, KL Loss: {round(epoch_kl_loss, 2)}, Total Loss: {round(total_loss, 2)}")
         scheduler.step(total_loss)
 
-        if total_loss < min_loss:
+        if epoch_recon_loss < min_loss:
             vae = vae.to('cpu')
-            min_loss = total_loss
+            min_loss = epoch_recon_loss
             best_model = vae.state_dict()
             torch.save(vae.state_dict(), save_path)
             vae = vae.to(device)

@@ -80,13 +80,13 @@ def plot_scatter_with_labels(df):
 if __name__ == '__main__':
     setup_dict = {
         'test_batch': True,
-        'latent_dim': 128,
+        'latent_dim': 32,
         'n_epochs': 50,
         'save_path': 'models/vae_1.pkl',
         'data_dir_path': '/Users/galblecher/Desktop/private/inter/imagene/DS_dataset/test',
         'kl_coeff': 1e-6,
         'lr': 0.001,
-        'load_path': '/Users/galblecher/Desktop/private/inter/VAE/models/vae_1.pkl'
+        'load_path': '/Users/galblecher/Desktop/private/inter/VAE/models/vae_3.pkl'
     }
     model = load_model(setup_dict)
     low_dim_data = two_dims_from_z(setup_dict, model)

@@ -68,7 +68,7 @@ def train_vae(vae, train_loader, num_epochs, save_path, setup_dict):
 
         print(
             f"Epoch [{epoch + 1}/{num_epochs}]: Recon Loss: {round(epoch_recon_loss,5)}, KL Loss: {round(epoch_kl_loss, 2)}, Total Loss: {round(total_loss, 2)}")
-        scheduler.step(total_loss)
+        scheduler.step()
 
         if epoch_recon_loss < min_loss:
             print('saving model')

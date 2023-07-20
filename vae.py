@@ -35,7 +35,7 @@ class VAE(nn.Module):
 
     def reparameterize(self, mu, logvar):
         std = torch.exp(0.5 * logvar)
-        epsilon = torch.randn_like(std)
+        epsilon = torch.randn_like(std) * 0.01
         z = mu + epsilon * std
         return z
 

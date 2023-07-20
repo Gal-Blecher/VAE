@@ -20,7 +20,7 @@ def run(setup_dict):
 if __name__ == '__main__':
     setup_dict = {
         'test_batch': True,
-        'latent_dim': 128,
+        'latent_dim': 32,
         'n_epochs': 200,
         'save_path': 'models/vae_4.pkl',
         'data_dir_path': '/home/gal/DS_dataset/train',

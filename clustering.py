@@ -26,10 +26,10 @@ if __name__ == '__main__':
         'test_batch': True,
         'latent_dim': 128,
         'n_epochs': 50,
-        'save_path': 'models/vae_2.pkl',
+        'save_path': 'models/vae_1.pkl',
         'data_dir_path': '/Users/galblecher/Desktop/private/inter/imagene/DS_dataset',
         'kl_coeff': 1e-6,
         'lr': 0.001,
-        'load_path': 'models/vae_1.pkl'
+        'load_path': '/Users/galblecher/Desktop/private/inter/VAE/models/vae_1.pkl'
     }
     model = load_model(setup_dict)

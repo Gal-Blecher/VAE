@@ -19,7 +19,7 @@ class VAE(nn.Module):
             nn.Linear(512, 1024),
             nn.ReLU(),
             nn.Linear(1024, 3 * 256 * 256),
-            nn.Sigmoid()
+            # nn.Sigmoid() # to turn off when using mse
         )
 
     def encode(self, x):

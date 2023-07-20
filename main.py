@@ -25,7 +25,7 @@ if __name__ == '__main__':
         'save_path': 'models/vae_4.pkl',
         'data_dir_path': '/home/gal/DS_dataset/train',
         'kl_coeff': 1e-5,
-        'lr': 0.01
+        'lr': 0.001
     }
     run(setup_dict)
 

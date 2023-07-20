@@ -4,6 +4,7 @@ import torch.optim as optim
 import matplotlib.pyplot as plt
 import numpy as np
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.optim.lr_scheduler import StepLR
 
 
 def plot_images(original_images, reconstructed_images):
@@ -35,7 +36,7 @@ def train_vae(vae, train_loader, num_epochs, save_path, setup_dict):
 
     recon_criterion = nn.MSELoss()
     optimizer = optim.Adam(vae.parameters(), lr=setup_dict['lr'])
-    scheduler = ReduceLROnPlateau(optimizer, patience=10, factor=0.1, verbose=True)
+    scheduler = StepLR(optimizer, step_size=50, gamma=0.1)
 
 
     min_loss = float('inf')

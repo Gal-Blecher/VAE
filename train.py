@@ -35,7 +35,7 @@ def train_vae(vae, train_loader, num_epochs, save_path, setup_dict):
 
     recon_criterion = nn.MSELoss()
     optimizer = optim.Adam(vae.parameters(), lr=setup_dict['lr'])
-    scheduler = ReduceLROnPlateau(optimizer, patience=30, factor=0.1, verbose=True)
+    scheduler = ReduceLROnPlateau(optimizer, patience=10, factor=0.1, verbose=True)
 
 
     min_loss = float('inf')

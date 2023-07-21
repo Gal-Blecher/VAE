@@ -86,7 +86,7 @@ if __name__ == '__main__':
         'data_dir_path': '/Users/galblecher/Desktop/private/inter/imagene/DS_dataset/test',
         'kl_coeff': 1e-5,
         'lr': 0.001,
-        'load_path': '/Users/galblecher/Desktop/private/inter/VAE/models/vae_5.pkl'
+        'load_path': '/Users/galblecher/Desktop/private/inter/VAE/models/vae_6.pkl'
     }
     model = load_model(setup_dict)
     low_dim_data = two_dims_from_z(setup_dict, model)

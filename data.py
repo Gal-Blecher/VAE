@@ -34,8 +34,8 @@ def get_dataloader(path_to_images_folder):
     # mean, std = calculate_mean_std(path_to_images_folder)
 
     transform = transforms.Compose([
-        transforms.Resize((64, 64)),
-        transforms.RandomHorizontalFlip(),
+        transforms.CenterCrop((128, 128)),
+        # transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize(mean=(0.2438, 0.2180, 0.2218), std=(0.4609, 0.4237, 0.3003))
     ])
@@ -44,6 +44,6 @@ def get_dataloader(path_to_images_folder):
     dataset = ImageFolder(root=path_to_images_folder, transform=transform)
 
     # Create a data loader for the dataset
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=256, shuffle=True)
 
     return dataloader

@@ -2,54 +2,94 @@ import torch
 import torch.nn as nn
 from torchvision.models import resnet18
 
+
+class Reshape(nn.Module):
+    def __init__(self, *args):
+        super().__init__()
+        self.shape = args
+
+    def forward(self, x):
+        return x.view(self.shape)
+
+
+class Trim(nn.Module):
+    def __init__(self, *args):
+        super().__init__()
+
+    def forward(self, x):
+        return x[:, :, :128, :128]
+
+
 class VAE(nn.Module):
-    def __init__(self, latent_dim):
-        super(VAE, self).__init__()
+    def __init__(self):
+        super().__init__()
 
-        # Encoder (ResNet-18)
-        self.encoder = resnet18(pretrained=True)
-        self.encoder = nn.Sequential(*list(self.encoder.children())[:-1])
+        self.encoder = nn.Sequential(
+            nn.Conv2d(3, 32, stride=2, kernel_size=3, bias=False, padding=1),
+            nn.BatchNorm2d(32),
+            nn.LeakyReLU(0.1, inplace=True),
+            nn.Dropout2d(0.25),
+            #
+            nn.Conv2d(32, 64, stride=2, kernel_size=3, bias=False, padding=1),
+            nn.BatchNorm2d(64),
+            nn.LeakyReLU(0.1, inplace=True),
+            nn.Dropout2d(0.25),
+            #
+            nn.Conv2d(64, 64, stride=2, kernel_size=3, bias=False, padding=1),
+            nn.BatchNorm2d(64),
+            nn.LeakyReLU(0.1, inplace=True),
+            nn.Dropout2d(0.25),
+            #
+            nn.Conv2d(64, 64, stride=2, kernel_size=3, bias=False, padding=1),
+            nn.BatchNorm2d(64),
+            nn.LeakyReLU(0.1, inplace=True),
+            nn.Dropout2d(0.25),
+            #
+            nn.Flatten(),
+        )
 
-        # Decoder
-        self.fc = nn.Linear(latent_dim, 256 * 8 * 8)
-        self.deconv1 = nn.ConvTranspose2d(256, 128, 4, 2, 1, bias=False)
-        self.bn1 = nn.BatchNorm2d(128)
-        self.deconv2 = nn.ConvTranspose2d(128, 64, 4, 2, 1, bias=False)
-        self.bn2 = nn.BatchNorm2d(64)
-        self.deconv3 = nn.ConvTranspose2d(64, 3, 4, 2, 1, bias=False)
-        self.tanh = nn.Tanh()
+        self.z_mean = torch.nn.Linear(4096, 200)
+        self.z_log_var = torch.nn.Linear(4096, 200)
 
-    def decoder(self, z):
-        z = self.fc(z)
-        z = z.view(z.size(0), 256, 8, 8)  # Reshape to (batch_size, 256, 8, 8)
-        z = self.deconv1(z)
-        z = self.bn1(z)
-        z = torch.relu(z)
-        z = self.deconv2(z)
-        z = self.bn2(z)
-        z = torch.relu(z)
-        z = self.deconv3(z)
-        # z = self.tanh(z)
-        return z
+        self.decoder = nn.Sequential(
+            torch.nn.Linear(200, 4096),
+            Reshape(-1, 64, 8, 8),
+            #
+            nn.ConvTranspose2d(64, 64, stride=2, kernel_size=3),
+            nn.BatchNorm2d(64),
+            nn.LeakyReLU(0.1, inplace=True),
+            nn.Dropout2d(0.25),
+            #
+            nn.ConvTranspose2d(64, 64, stride=2, kernel_size=3, padding=1),
+            nn.BatchNorm2d(64),
+            nn.LeakyReLU(0.1, inplace=True),
+            nn.Dropout2d(0.25),
+            #
+            nn.ConvTranspose2d(64, 32, stride=2, kernel_size=3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.LeakyReLU(0.1, inplace=True),
+            nn.Dropout2d(0.25),
+            #
+            nn.ConvTranspose2d(32, 3, stride=2, kernel_size=3, padding=1),
+            #
+            Trim(),  # 3x129x129 -> 3x128x128
+            nn.Sigmoid()
+        )
 
-    def encode(self, x):
+    def encoding_fn(self, x):
         x = self.encoder(x)
-        x = x.view(x.size(0), -1)
-        mu, logvar = torch.chunk(x, 2, dim=1)
-        return mu, logvar
+        z_mean, z_log_var = self.z_mean(x), self.z_log_var(x)
+        encoded = self.reparameterize(z_mean, z_log_var)
+        return encoded
 
-    def decode(self, z):
-        output = self.decoder(z)
-        return output
-
-    def reparameterize(self, mu, logvar):
-        std = torch.exp(0.5 * logvar)
-        epsilon = torch.randn_like(std) * 0.001
-        z = mu + epsilon * std
+    def reparameterize(self, z_mu, z_log_var):
+        eps = torch.randn(z_mu.size(0), z_mu.size(1)).to(z_mu.get_device())
+        z = z_mu + eps * torch.exp(z_log_var / 2.)
         return z
 
     def forward(self, x):
-        mu, logvar = self.encode(x)
-        z = self.reparameterize(mu, logvar)
-        output = self.decode(z)
-        return output, mu, logvar
+        x = self.encoder(x)
+        z_mean, z_log_var = self.z_mean(x), self.z_log_var(x)
+        encoded = self.reparameterize(z_mean, z_log_var)
+        decoded = self.decoder(encoded)
+        return encoded, z_mean, z_log_var, decoded

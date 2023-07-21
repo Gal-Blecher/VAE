@@ -7,6 +7,7 @@ import data
 from sklearn.manifold import TSNE
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.mixture import GaussianMixture
 
 
 def load_model(setup_dict):
@@ -21,6 +22,7 @@ def load_model(setup_dict):
     mu, logvar = model.encode(batch)
     z = model.reparameterize(mu, logvar)
     output = model.decode(z)
+    train.plot_images(batch, output)
 
     return model
 
@@ -45,7 +47,7 @@ def two_dims_from_z(setup_dict, model):
         all_labels = np.array(all_labels)
 
         # Reduce dimensionality of z to 2 using t-SNE
-        tsne = TSNE(n_components=2, random_state=42)
+        tsne = TSNE(n_components=2, random_state=42, perplexity=50, n_iter=10_000)
         reduced_z = tsne.fit_transform(all_z)
 
         # Create the DataFrame with reduced z values and labels
@@ -53,7 +55,7 @@ def two_dims_from_z(setup_dict, model):
         df['y'] = reduced_z[:, 1]
         df['label'] = all_labels
 
-    return df
+    return df, all_z, reduced_z
 
 def plot_scatter_with_labels(df):
     plt.figure(figsize=(8, 6))
@@ -73,6 +75,25 @@ def plot_scatter_with_labels(df):
     plt.show()
 
 
+def cluster(z):
+    # Convert the PyTorch tensor to a numpy array
+    data = z.cpu().numpy()  # Assuming 'z' is a tensor on the CPU; use .cuda() if on GPU
+
+    # Create an instance of GaussianMixture with 5 clusters
+    n_clusters = 5
+    gmm = GaussianMixture(n_components=n_clusters, random_state=42)
+
+    # Fit the GMM to the data
+    gmm.fit(data)
+
+    # Get the predicted cluster labels for each data point
+    cluster_labels = gmm.predict(data)
+
+    return cluster_labels
+
+
+
+
 
 
 
@@ -80,15 +101,18 @@ def plot_scatter_with_labels(df):
 if __name__ == '__main__':
     setup_dict = {
         'test_batch': True,
-        'latent_dim': 256,
+        'latent_dim': 128,
         'n_epochs': 50,
         'save_path': 'models/vae_1.pkl',
         'data_dir_path': '/Users/galblecher/Desktop/private/inter/imagene/DS_dataset/test',
         'kl_coeff': 1e-5,
         'lr': 0.001,
-        'load_path': '/Users/galblecher/Desktop/private/inter/VAE/models/auto_encoder_vae_like.pkl'
+        'load_path': '/Users/galblecher/Desktop/private/inter/VAE/models/vae_8.pkl'
     }
     model = load_model(setup_dict)
-    low_dim_data = two_dims_from_z(setup_dict, model)
-    plot_scatter_with_labels(low_dim_data)
+    df, all_z, reduced_z = two_dims_from_z(setup_dict, model)
+    plot_scatter_with_labels(df)
+    preds = cluster(torch.tensor(reduced_z))
+    df['label'] = preds
+    plot_scatter_with_labels(df)
     t=1

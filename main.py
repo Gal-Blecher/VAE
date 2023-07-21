@@ -22,10 +22,10 @@ if __name__ == '__main__':
         'test_batch': True,
         'latent_dim': 256,
         'n_epochs': 200,
-        'save_path': 'models/vae_7.pkl',
+        'save_path': 'models/auto_encoder_vae_like.pkl',
         'data_dir_path': '/home/gal/DS_dataset/train',
         # 'data_dir_path': '/Users/galblecher/Desktop/private/inter/imagene/DS_dataset/train',
-        'kl_coeff': 1e-5,
+        'kl_coeff': 0,
         'lr': 0.001
     }
     run(setup_dict)

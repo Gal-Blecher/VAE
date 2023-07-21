@@ -36,7 +36,7 @@ def train_vae(vae, train_loader, num_epochs, save_path, setup_dict):
 
     recon_criterion = nn.MSELoss()
     optimizer = optim.Adam(vae.parameters(), lr=setup_dict['lr'])
-    scheduler = StepLR(optimizer, step_size=50, gamma=0.1)
+    scheduler = StepLR(optimizer, step_size=70, gamma=0.1)
 
 
     min_loss = float('inf')

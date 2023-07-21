@@ -8,7 +8,8 @@ class VAE(nn.Module):
 
         # Encoder (ResNet-18)
         self.encoder = resnet18(pretrained=True)
-        self.encoder = nn.Sequential(*list(self.encoder.children())[:-1])
+        # self.encoder = nn.Sequential(*list(self.encoder.children())[:-1])
+        self.encoder.fc = nn.Linear(512, latent_dim*2)
 
         # Decoder
         self.fc = nn.Linear(latent_dim, 256 * 8 * 8)
@@ -44,7 +45,7 @@ class VAE(nn.Module):
 
     def reparameterize(self, mu, logvar):
         std = torch.exp(0.5 * logvar)
-        epsilon = torch.randn_like(std) * 0
+        epsilon = torch.randn_like(std) * 0.01
         z = mu + epsilon * std
         return z
 

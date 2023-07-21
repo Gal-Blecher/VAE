@@ -34,7 +34,7 @@ def get_dataloader(path_to_images_folder):
     # mean, std = calculate_mean_std(path_to_images_folder)
 
     transform = transforms.Compose([
-        transforms.Resize((256, 256)),
+        transforms.Resize((64, 64)),
         transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize(mean=(0.2438, 0.2180, 0.2218), std=(0.4609, 0.4237, 0.3003))

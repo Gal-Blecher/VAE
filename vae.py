@@ -11,16 +11,26 @@ class VAE(nn.Module):
         self.encoder.fc = nn.Linear(512, latent_dim * 2)
 
         # Decoder
-        self.decoder = nn.Sequential(
-            nn.Linear(latent_dim, 256),
-            nn.ReLU(),
-            nn.Linear(256, 512),
-            nn.ReLU(),
-            nn.Linear(512, 1024),
-            nn.ReLU(),
-            nn.Linear(1024, 3 * 256 * 256),
-            # nn.Sigmoid() # to turn off when using mse
-        )
+        self.fc = nn.Linear(latent_dim, 256 * 8 * 8)
+        self.deconv1 = nn.ConvTranspose2d(256, 128, 4, 2, 1, bias=False)
+        self.bn1 = nn.BatchNorm2d(128)
+        self.deconv2 = nn.ConvTranspose2d(128, 64, 4, 2, 1, bias=False)
+        self.bn2 = nn.BatchNorm2d(64)
+        self.deconv3 = nn.ConvTranspose2d(64, 3, 4, 2, 1, bias=False)
+        self.tanh = nn.Tanh()
+
+    def decoder(self, z):
+        z = self.fc(z)
+        z = z.view(z.size(0), 256, 8, 8)  # Reshape to (batch_size, 256, 8, 8)
+        z = self.deconv1(z)
+        z = self.bn1(z)
+        z = torch.relu(z)
+        z = self.deconv2(z)
+        z = self.bn2(z)
+        z = torch.relu(z)
+        z = self.deconv3(z)
+        z = self.tanh(z)
+        return z
 
     def encode(self, x):
         x = self.encoder(x)
@@ -30,7 +40,6 @@ class VAE(nn.Module):
 
     def decode(self, z):
         output = self.decoder(z)
-        output = output.view(-1, 3, 256, 256)
         return output
 
     def reparameterize(self, mu, logvar):

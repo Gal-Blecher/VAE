@@ -24,6 +24,7 @@ if __name__ == '__main__':
         'n_epochs': 200,
         'save_path': 'models/vae_4.pkl',
         'data_dir_path': '/home/gal/DS_dataset/train',
+        # 'data_dir_path': '/Users/galblecher/Desktop/private/inter/imagene/DS_dataset/train',
         'kl_coeff': 1e-5,
         'lr': 0.001
     }

@@ -8,7 +8,7 @@ class VAE(nn.Module):
 
         # Encoder (ResNet-18)
         self.encoder = resnet18(pretrained=True)
-        self.encoder.fc = nn.Linear(512, latent_dim * 2)
+        self.encoder = nn.Sequential(*list(self.encoder.children())[:-1])
 
         # Decoder
         self.fc = nn.Linear(latent_dim, 256 * 8 * 8)
@@ -29,7 +29,7 @@ class VAE(nn.Module):
         z = self.bn2(z)
         z = torch.relu(z)
         z = self.deconv3(z)
-        z = self.tanh(z)
+        # z = self.tanh(z)
         return z
 
     def encode(self, x):

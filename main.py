@@ -20,9 +20,9 @@ def run(setup_dict):
 if __name__ == '__main__':
     setup_dict = {
         'test_batch': True,
-        'latent_dim': 32,
+        'latent_dim': 256,
         'n_epochs': 200,
-        'save_path': 'models/vae_4.pkl',
+        'save_path': 'models/vae_5.pkl',
         'data_dir_path': '/home/gal/DS_dataset/train',
         # 'data_dir_path': '/Users/galblecher/Desktop/private/inter/imagene/DS_dataset/train',
         'kl_coeff': 1e-5,

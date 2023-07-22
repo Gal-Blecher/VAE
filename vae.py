@@ -5,8 +5,7 @@ from torchvision.models import resnet18
 class VAE(nn.Module):
     def __init__(self, latent_dim):
         super(VAE, self).__init__()
-
-        # Encoder (ResNet-18)
+        # Encoder
         self.encoder = resnet18(pretrained=True)
         # self.encoder = nn.Sequential(*list(self.encoder.children())[:-1])
         self.encoder.fc = nn.Linear(512, latent_dim*2)

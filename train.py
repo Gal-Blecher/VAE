@@ -12,12 +12,10 @@ def plot_images(original_images, reconstructed_images):
     plt.subplots_adjust(wspace=0.1)
 
     for i in range(5):
-        # Plot original images
         axes[0, i].imshow(np.transpose(original_images[i].detach().numpy(), (1, 2, 0)))
         axes[0, i].axis('off')
         axes[0, i].set_title('Original')
 
-        # Plot reconstructed images
         axes[1, i].imshow(np.transpose(reconstructed_images[i].detach().numpy(), (1, 2, 0)))
         axes[1, i].axis('off')
         axes[1, i].set_title('Reconstructed')

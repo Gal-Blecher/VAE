@@ -3,16 +3,12 @@ import torchvision.transforms as transforms
 from torchvision.datasets import ImageFolder
 
 def calculate_mean_std(image_folder_path):
-    # Define the transformation to calculate mean and standard deviation
     transform = transforms.Compose([
-        transforms.Resize((256, 256)),  # Resize images to a consistent size
-        transforms.ToTensor()  # Convert images to tensors
+        transforms.Resize((256, 256)),
+        transforms.ToTensor()
     ])
-
-    # Load the image dataset without labels
     dataset = ImageFolder(root=image_folder_path, transform=transform)
 
-    # Calculate mean and standard deviation
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
     mean = 0.
     std = 0.
@@ -39,11 +35,7 @@ def get_dataloader(path_to_images_folder):
         transforms.ToTensor(),
         transforms.Normalize(mean=(0.2438, 0.2180, 0.2218), std=(0.4609, 0.4237, 0.3003))
     ])
-
-    # Load the image dataset with the desired transforms
     dataset = ImageFolder(root=path_to_images_folder, transform=transform)
-
-    # Create a data loader for the dataset
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)
 
     return dataloader

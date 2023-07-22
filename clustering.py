@@ -11,7 +11,6 @@ from sklearn.mixture import GaussianMixture
 
 
 def load_model(setup_dict):
-    # Create an instance of the model
     model = vae.VAE(setup_dict['latent_dim'])
     state_dict = torch.load(setup_dict['load_path'])
     model.load_state_dict(state_dict)
@@ -30,10 +29,10 @@ def load_model(setup_dict):
 def two_dims_from_z(setup_dict, model):
     dataloader = data.get_dataloader(setup_dict['data_dir_path'])
     df = pd.DataFrame(columns=['x', 'y', 'label'])
-    all_z = []  # To store all the z values
-    all_labels = []  # To store all the labels
+    all_z = []
+    all_labels = []
 
-    with torch.no_grad():  # Disable gradient computation
+    with torch.no_grad():
         for images, labels in dataloader:
             mu, logvar = model.encode(images)
             z = model.reparameterize(mu, logvar)
@@ -41,16 +40,13 @@ def two_dims_from_z(setup_dict, model):
             all_z.append(z)
             all_labels += labels.tolist()
 
-    # Concatenate all z values and labels (if not empty)
     if len(all_labels) > 0:
         all_z = torch.cat(all_z, dim=0)
         all_labels = np.array(all_labels)
 
-        # Reduce dimensionality of z to 2 using t-SNE
         tsne = TSNE(n_components=2, random_state=42, perplexity=50, n_iter=10_000)
         reduced_z = tsne.fit_transform(all_z)
 
-        # Create the DataFrame with reduced z values and labels
         df['x'] = reduced_z[:, 0]
         df['y'] = reduced_z[:, 1]
         df['label'] = all_labels
@@ -76,38 +72,25 @@ def plot_scatter_with_labels(df):
 
 
 def cluster(z):
-    # Convert the PyTorch tensor to a numpy array
-    data = z.cpu().numpy()  # Assuming 'z' is a tensor on the CPU; use .cuda() if on GPU
+    data = z.cpu().numpy()
 
-    # Create an instance of GaussianMixture with 5 clusters
     n_clusters = 5
     gmm = GaussianMixture(n_components=n_clusters, random_state=42)
-
-    # Fit the GMM to the data
     gmm.fit(data)
-
-    # Get the predicted cluster labels for each data point
     cluster_labels = gmm.predict(data)
 
     return cluster_labels
 
-
-
-
-
-
-
-
 if __name__ == '__main__':
     setup_dict = {
         'test_batch': True,
-        'latent_dim': 128,
+        'latent_dim': 256,
         'n_epochs': 50,
         'save_path': 'models/vae_1.pkl',
         'data_dir_path': '/Users/galblecher/Desktop/private/inter/imagene/DS_dataset/test',
         'kl_coeff': 1e-5,
         'lr': 0.001,
-        'load_path': '/Users/galblecher/Desktop/private/inter/VAE/models/vae_8.pkl'
+        'load_path': '/Users/galblecher/Desktop/private/inter/VAE/models/vae_10_256.pkl'
     }
     model = load_model(setup_dict)
     df, all_z, reduced_z = two_dims_from_z(setup_dict, model)
@@ -115,4 +98,3 @@ if __name__ == '__main__':
     preds = cluster(torch.tensor(reduced_z))
     df['label'] = preds
     plot_scatter_with_labels(df)
-    t=1
